@@ -103,6 +103,10 @@ function App() {
           <div className="w-1/2">
             <Result func={selectedFunc} delimeter={delimeter} flag={showPlot} hasPoint={hasPoint} box={polygon?.boundingBox()}/>
             <IntegralPlot delimeter={delimeter} hasPoint={hasPoint} func={selectedFunc} flag={showPlot} box={polygon?.boundingBox()}/>
+            <div className="m-3 p-4 rounded-xl bg-white shadow-lg">
+              <p className="w-full text-center text-xl font-semibold m-1">Описание работы</p>
+              <p>Прямоугольник в котором находится функция разбивается по каждой из координат на число разбиения области. После значение интеграла находится методом прямоугольников. Значение ошибки находится с помощью суммирования разницы между значением объема методом прямоугольников и методом трапеции.</p>
+            </div>
           </div>
         </div>
       </div>

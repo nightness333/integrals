@@ -20,9 +20,11 @@ function Result({func, delimeter, flag, hasPoint, box}: ResultProps) {
     }, [func, delimeter, flag])
 
     const [result, setResult] = useState(0)
+    const [error, setError] = useState(0)
 
     const calculateIntegral = () => {
         let result_ = 0
+        let error_ = 0
 
         let x_width = (box![2] - box![0]) / delimeter
         let y_width = (box![1] - box![3]) / delimeter
@@ -32,22 +34,34 @@ function Result({func, delimeter, flag, hasPoint, box}: ResultProps) {
                 const y = box![3] + j * y_width
                 if (hasPoint(x,y)) {
                     result_ += func(x, y) * x_width * y_width
+                    error_ += Math.abs(func(x + x_width / 2, y + y_width / 2) - func(x, y)) * x_width * y_width
                 }
             }
         }
 
         setResult(result_)
+        setError(error_)
     }
 
     return (
         <>
-            <div className="m-3 p-2 rounded-xl bg-white shadow-lg flex flex-col items-center">
-                <p className="font-semibold text-xl">
-                    Результат
-                </p>
-                <p className="font-bold text-2xl">
-                    {result}
-                </p>
+            <div className="m-3 p-2 rounded-xl bg-white shadow-lg flex flex-row justify-around">
+                <div className="flex flex-col items-center m-1">
+                    <p className="font-semibold text-xl">
+                        Результат
+                    </p>
+                    <p className="font-bold text-2xl">
+                        {result}
+                    </p>
+                </div>
+                <div className="flex flex-col items-center m-1">
+                    <p className="font-semibold text-xl">
+                        Ошибка
+                    </p>
+                    <p className="font-bold text-2xl">
+                        {error}
+                    </p>
+                </div>
             </div>
         </>
     )
