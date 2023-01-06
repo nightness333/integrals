@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import Result from "./components/Result";
 import Graph from "./components/Graph";
@@ -7,26 +7,49 @@ import Latex from "react-latex";
 
 function App() {
 
-  const [result, setResult] = useState(0)
   const [polygon, setPolygon] = useState<JXG.Polygon>()
   const [board, setBoard] = useState<JXG.Board>()
   const [showPlot, setShowPlot] = useState(false)
 
   const [delimeter, setDelimeter] = useState(10)
 
-  const func1 = (x: number, y: number): number => {
+  const func1_init = (x: number, y: number): number => {
     return x*x + x*y + y*y
   }
 
-  const func2 = (x: number, y: number): number => {
+  const func1_diff_xx = (x: number, y: number): number => {
+    return 2
+  }
+
+  const func1_diff_yy = (x: number, y: number): number => {
+    return 2
+  }
+
+  const func2_init = (x: number, y: number): number => {
     return y*Math.cos(x*y)
   }
 
-  const func3 = (x: number, y: number): number => {
+  const func2_diff_xx = (x: number, y: number): number => {
+    return - (y * y * y) * Math.cos(x * y)
+  }
+
+  const func2_diff_yy = (x: number, y: number): number => {
+    return -x * (2 * Math.sin(x * y) + x * y * Math.cos(x * y))
+  }
+
+  const func3_init = (x: number, y: number): number => {
     return (1/9)*y*Math.exp(x)
   }
 
-  const [selectedFunc, setFunc] = useState<(x: number, y: number) => number>(() => func1)
+  const func3_diff_xx = (x: number, y: number): number => {
+    return (1/9)*y*Math.exp(x)
+  }
+
+  const func3_diff_yy = (x: number, y: number): number => {
+    return 0
+  }
+
+  const [selectedFunc, setFunc] = useState<((x: number, y: number) => number)[]>([func1_init,func1_diff_xx, func1_diff_yy])
 
   const hasPoint = (x: number, y: number): boolean => {
     if (board && polygon) {
@@ -46,7 +69,6 @@ function App() {
   const clear = () => {
     setPolygon(undefined)
     setBoard(undefined)
-    setResult(0)
     setShowPlot(false)
     setDelimeter(10)
   }
@@ -71,15 +93,15 @@ function App() {
                     value={delimeter} onChange={onChangeDelimeter} type="text"/>
               </div>
               <div className="inline-flex w-full m-1 my-3" role="group">
-                <button type="button" onClick={() => setFunc(() => func1)}
+                <button type="button" onClick={() => setFunc([func1_init, func1_diff_xx, func1_diff_yy])}
                         className="w-1/3 rounded-lg inline-block m-2 p-2 bg-neutral-600 text-white hover:bg-neutral-800 focus:bg-neutral-800 focus:outline-none focus:ring-0 active:bg-neutral-800 transition duration-300">
                   <Latex>$x^2 + xy + y^2$</Latex>
                 </button>
-                <button type="button" onClick={() => setFunc(() => func2)}
+                <button type="button" onClick={() => setFunc([func2_init, func2_diff_xx, func2_diff_yy])}
                         className="w-1/3 rounded-lg inline-block m-2 p-2 bg-neutral-600 text-white hover:bg-neutral-800 focus:bg-neutral-800 focus:outline-none focus:ring-0 active:bg-neutral-800 transition duration-300">
                   <Latex>$ycos(xy)$</Latex>
                 </button>
-                <button type="button" onClick={() => setFunc(() => func3)}
+                <button type="button" onClick={() => setFunc([func3_init, func3_diff_xx, func3_diff_yy])}
                         className="w-1/3 rounded-lg inline-block m-2 p-2 bg-neutral-600 text-white hover:bg-neutral-800 focus:bg-neutral-800 focus:outline-none focus:ring-0 active:bg-neutral-800 transition duration-300">
                   <Latex displayMode={true}>{'$\\frac{1}{9}ye^x$'}</Latex>
                 </button>
@@ -102,7 +124,7 @@ function App() {
           </div>
           <div className="w-1/2">
             <Result func={selectedFunc} delimeter={delimeter} flag={showPlot} hasPoint={hasPoint} box={polygon?.boundingBox()}/>
-            <IntegralPlot delimeter={delimeter} hasPoint={hasPoint} func={selectedFunc} flag={showPlot} box={polygon?.boundingBox()}/>
+            <IntegralPlot delimeter={delimeter} hasPoint={hasPoint} func={selectedFunc[0]} flag={showPlot} box={polygon?.boundingBox()}/>
             <div className="m-3 p-4 rounded-xl bg-white shadow-lg">
               <p className="w-full text-center text-xl font-semibold m-1">Описание работы</p>
               <p>Прямоугольник в котором находится функция разбивается по каждой из координат на число разбиения области. После значение интеграла находится методом прямоугольников. Значение ошибки находится с помощью суммирования разницы между значением объема методом прямоугольников и методом трапеции.</p>

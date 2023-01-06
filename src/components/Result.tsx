@@ -1,7 +1,7 @@
-import {Component, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 interface ResultProps {
-    func: (x: number, y: number) => number
+    func: ((x: number, y: number) => number)[]
     delimeter: number
     flag: boolean
     hasPoint: (x: number, y: number) => boolean
@@ -16,11 +16,19 @@ function Result({func, delimeter, flag, hasPoint, box}: ResultProps) {
         }
         if (!flag) {
             setResult(0)
+            setError(0)
         }
     }, [func, delimeter, flag])
 
     const [result, setResult] = useState(0)
     const [error, setError] = useState(0)
+
+    const hasRectangle = (x: number, y: number, x_width: number, y_width: number) => {
+        return hasPoint(x - x_width / 2, y - y_width / 2) &&
+            hasPoint(x + x_width / 2, y + y_width / 2) &&
+            hasPoint(x - x_width / 2, y + y_width / 2) &&
+            hasPoint(x + x_width / 2, y - y_width / 2)
+    }
 
     const calculateIntegral = () => {
         let result_ = 0
@@ -28,19 +36,20 @@ function Result({func, delimeter, flag, hasPoint, box}: ResultProps) {
 
         let x_width = (box![2] - box![0]) / delimeter
         let y_width = (box![1] - box![3]) / delimeter
+        console.log(box, x_width, y_width, delimeter)
         for (let i = 0; i < delimeter; i++) {
             for (let j = 0 ; j < delimeter; j++) {
-                const x = box![0] + i * x_width
-                const y = box![3] + j * y_width
-                if (hasPoint(x,y)) {
-                    result_ += func(x, y) * x_width * y_width
-                    error_ += Math.abs(func(x + x_width / 2, y + y_width / 2) - func(x, y)) * x_width * y_width
+                const x = box![0] + i * x_width + x_width / 2
+                const y = box![3] + j * y_width + y_width / 2
+                if (hasRectangle(x, y, x_width, y_width)) {
+                    result_ += func[0](x, y) * x_width * y_width
+                    error_ += (x_width * x_width * func[1](x, y) + y_width * y_width * func[2](x, y))
                 }
             }
         }
 
         setResult(result_)
-        setError(error_)
+        setError((1/24) * x_width * y_width * error_)
     }
 
     return (

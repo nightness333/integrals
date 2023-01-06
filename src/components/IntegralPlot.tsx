@@ -21,8 +21,8 @@ function IntegralPlot({delimeter, hasPoint, func, flag, box}: IntegralPlotProps)
             let cnt = 1
             let x_step = (box[2] - box[0]) / delimeter
             let y_step = (box[1] - box[3]) / delimeter
-            for (let i = box[0]; i <= box[2]; i = i + x_step) {
-                for (let j = box[3]; j <= box[1]; j = j + y_step) {
+            for (let i = box[0] + x_step / 2; i <= box[2]; i = i + x_step) {
+                for (let j = box[3] + y_step / 2; j <= box[1]; j = j + y_step) {
                     if (hasPoint(i, j)) {
                         x_temp.push(i)
                         y_temp.push(j)
