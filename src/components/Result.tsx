@@ -33,23 +33,28 @@ function Result({func, delimeter, flag, hasPoint, box}: ResultProps) {
     const calculateIntegral = () => {
         let result_ = 0
         let error_ = 0
+        let error_side = 0
 
         let x_width = (box![2] - box![0]) / delimeter
         let y_width = (box![1] - box![3]) / delimeter
-        console.log(box, x_width, y_width, delimeter)
         for (let i = 0; i < delimeter; i++) {
             for (let j = 0 ; j < delimeter; j++) {
                 const x = box![0] + i * x_width + x_width / 2
                 const y = box![3] + j * y_width + y_width / 2
                 if (hasRectangle(x, y, x_width, y_width)) {
                     result_ += func[0](x, y) * x_width * y_width
-                    error_ += (x_width * x_width * func[1](x, y) + y_width * y_width * func[2](x, y))
+                    error_ += (x_width * func[1](x, y) + y_width * func[2](x,y) +
+                        + (1/2 * x_width * x_width +
+                        + x_width * y_width  +
+                        + 1/2 * y_width * y_width) * func[3](Math.max(Math.abs(box![2]), Math.abs(box![0])), Math.max(Math.abs(box![1]), Math.abs(box![3]))))
+                } else if (hasPoint(x, y)) {
+                    error_side += x_width + y_width
                 }
             }
         }
 
         setResult(result_)
-        setError((1/24) * x_width * y_width * error_)
+        setError(error_ * 1/24 * x_width * y_width + error_side)
     }
 
     return (

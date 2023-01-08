@@ -17,11 +17,15 @@ function App() {
     return x*x + x*y + y*y
   }
 
-  const func1_diff_xx = (x: number, y: number): number => {
-    return 2
+  const func1_diff_x = (x: number, y: number): number => {
+    return 2*x + y
   }
 
-  const func1_diff_yy = (x: number, y: number): number => {
+  const func1_diff_y = (x: number, y: number): number => {
+    return x + 2*y
+  }
+
+  const func1_error = (x: number, y: number): number => {
     return 2
   }
 
@@ -29,27 +33,35 @@ function App() {
     return y*Math.cos(x*y)
   }
 
-  const func2_diff_xx = (x: number, y: number): number => {
-    return - (y * y * y) * Math.cos(x * y)
+  const func2_diff_x = (x: number, y: number): number => {
+    return - (y * y) * Math.sin(x*y)
   }
 
-  const func2_diff_yy = (x: number, y: number): number => {
-    return -x * (2 * Math.sin(x * y) + x * y * Math.cos(x * y))
+  const func2_diff_y = (x: number, y: number): number => {
+    return Math.cos(x*y) - x * y * Math.sin(x*y)
+  }
+
+  const func2_error = (x: number, y: number): number => {
+    return Math.max(Math.abs(-y * (2 + x * y)), Math.abs(-y * y * y), Math.abs(-x * (2 + x * y)))
   }
 
   const func3_init = (x: number, y: number): number => {
     return (1/9)*y*Math.exp(x)
   }
 
-  const func3_diff_xx = (x: number, y: number): number => {
+  const func3_diff_x = (x: number, y: number): number => {
     return (1/9)*y*Math.exp(x)
   }
 
-  const func3_diff_yy = (x: number, y: number): number => {
-    return 0
+  const func3_diff_y = (x: number, y: number): number => {
+    return (1/9)*Math.exp(x)
   }
 
-  const [selectedFunc, setFunc] = useState<((x: number, y: number) => number)[]>([func1_init,func1_diff_xx, func1_diff_yy])
+  const func3_error = (x: number, y: number): number => {
+    return y / 9 * Math.exp(x)
+  }
+
+  const [selectedFunc, setFunc] = useState<((x: number, y: number) => number)[]>([func1_init, func1_diff_x, func1_diff_y])
 
   const hasPoint = (x: number, y: number): boolean => {
     if (board && polygon) {
@@ -93,15 +105,15 @@ function App() {
                     value={delimeter} onChange={onChangeDelimeter} type="text"/>
               </div>
               <div className="inline-flex w-full m-1 my-3" role="group">
-                <button type="button" onClick={() => setFunc([func1_init, func1_diff_xx, func1_diff_yy])}
+                <button type="button" onClick={() => setFunc([func1_init, func1_diff_x, func1_diff_y, func1_error])}
                         className="w-1/3 rounded-lg inline-block m-2 p-2 bg-neutral-600 text-white hover:bg-neutral-800 focus:bg-neutral-800 focus:outline-none focus:ring-0 active:bg-neutral-800 transition duration-300">
                   <Latex>$x^2 + xy + y^2$</Latex>
                 </button>
-                <button type="button" onClick={() => setFunc([func2_init, func2_diff_xx, func2_diff_yy])}
+                <button type="button" onClick={() => setFunc([func2_init, func2_diff_x, func2_diff_y, func2_error])}
                         className="w-1/3 rounded-lg inline-block m-2 p-2 bg-neutral-600 text-white hover:bg-neutral-800 focus:bg-neutral-800 focus:outline-none focus:ring-0 active:bg-neutral-800 transition duration-300">
                   <Latex>$ycos(xy)$</Latex>
                 </button>
-                <button type="button" onClick={() => setFunc([func3_init, func3_diff_xx, func3_diff_yy])}
+                <button type="button" onClick={() => setFunc([func3_init, func3_diff_x, func3_diff_y, func3_error])}
                         className="w-1/3 rounded-lg inline-block m-2 p-2 bg-neutral-600 text-white hover:bg-neutral-800 focus:bg-neutral-800 focus:outline-none focus:ring-0 active:bg-neutral-800 transition duration-300">
                   <Latex displayMode={true}>{'$\\frac{1}{9}ye^x$'}</Latex>
                 </button>
@@ -127,8 +139,7 @@ function App() {
             <IntegralPlot delimeter={delimeter} hasPoint={hasPoint} func={selectedFunc[0]} flag={showPlot} box={polygon?.boundingBox()}/>
             <div className="m-3 p-4 rounded-xl bg-white shadow-lg">
               <p className="w-full text-center text-xl font-semibold m-1">Описание работы</p>
-              <p>Прямоугольник в котором находится функция разбивается по каждой из координат на число разбиения области. После значение интеграла находится методом ячеек. Значение ошибки находится с помощью суммирования погрешности интегрирования каждой ячейки. формула погрешности ячейки:</p>
-              <Latex displayMode={true}>{'$$\\frac{1}{24}S_{ij}(h_{x}^2f_{xx}^{\'\'}(x,y)+h_{y}^2f_{yy}^{\'\'}(x,y))$$'}</Latex>
+              <p>Прямоугольник в котором находится функция разбивается по каждой из координат на число разбиения области. После значение интеграла находится методом ячеек. Значение ошибки находится с помощью суммирования погрешности интегрирования каждой ячейки.</p>
             </div>
           </div>
         </div>
