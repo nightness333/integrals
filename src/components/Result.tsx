@@ -54,7 +54,7 @@ function Result({func, delimeter, flag, hasPoint, box}: ResultProps) {
         }
 
         setResult(result_)
-        setError(error_ * 1/24 * x_width * y_width + error_side)
+        setError(error_ * x_width * y_width + error_side)
     }
 
     return (
